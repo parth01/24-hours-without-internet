@@ -1,4 +1,4 @@
-name: 🎬 Render 24 Hours Without Internet - Full Audio
+name: 🎬 Render 24 Hours Without Internet - Final Video
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
 
@@ -39,11 +39,12 @@ jobs:
 
 
       # ============================================================
-      # 4. PROJECT DEPENDENCIES
+      # 4. INSTALL PROJECT
       # ============================================================
 
       - name: 📦 Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: |
+          pnpm install --no-frozen-lockfile
 
 
       # ============================================================
@@ -78,7 +79,7 @@ jobs:
 
 
       # ============================================================
-      # 8. PIPER TTS
+      # 8. PIPER
       # ============================================================
 
       - name: 🎙️ Install Piper TTS
@@ -88,73 +89,117 @@ jobs:
 
 
       # ============================================================
-      # 9. AUDIO DIRECTORIES
+      # 9. DIRECTORIES
       # ============================================================
 
-      - name: 📁 Create audio directories
+      - name: 📁 Create directories
         run: |
           mkdir -p audio
+          mkdir -p audio/voice
           mkdir -p audio/sfx
+          mkdir -p render
 
 
       # ============================================================
       # 10. NARRATION SCRIPT
       # ============================================================
 
-      - name: 📝 Create narration script
+      - name: 📝 Create 5-minute narration
         run: |
 
           cat > audio/narration.txt <<'EOF'
 
-          Imagine waking up tomorrow and discovering something impossible.
+          Imagine waking up tomorrow morning and discovering something impossible.
 
           The internet is gone.
 
           Not slow.
 
-          Not experiencing an outage.
+          Not experiencing a temporary outage.
 
           Completely gone.
 
-          At first, most people wouldn't even realize what had happened.
+          At first, you probably wouldn't even realize it.
 
-          Your phone still turns on.
+          Your phone would still turn on.
 
-          Your television still works.
+          Your television would still work.
 
-          The lights are still on.
+          The lights in your house would still be on.
 
-          But then you try to open a website.
+          Your car would still start.
 
-          Nothing.
+          Everything around you would look completely normal.
 
-          You check social media.
-
-          Nothing.
-
-          You try to send a message.
+          But then you would try to open a website.
 
           Nothing.
 
-          Within minutes, the world begins to realize that this isn't a normal outage.
+          You would open social media.
 
-          The quiet failure is everywhere.
+          Nothing.
 
-          Banks can't communicate.
+          You would try to send a message.
 
-          Businesses can't connect.
+          Nothing.
 
-          Cloud services disappear.
+          You would check your Wi-Fi.
 
-          And billions of devices that quietly depend on the internet suddenly become isolated.
+          It might say that you're connected.
 
-          The world goes offline.
+          But there would be nowhere to go.
 
-          One of the first things people would notice is money.
+          And then you would realize something much bigger was happening.
 
-          Modern payments depend heavily on connected systems.
+          This wasn't your router.
+
+          It wasn't your phone.
+
+          It wasn't your internet provider.
+
+          The entire world had suddenly lost its connection.
+
+          Within minutes, billions of people would begin doing exactly the same thing.
+
+          They would restart their routers.
+
+          Restart their phones.
+
+          Check their cables.
+
+          Call their internet providers.
+
+          And then they would start calling other people.
+
+          But those calls might not work either.
+
+          The first major problem would be communication.
+
+          Modern communication is deeply dependent on internet infrastructure.
+
+          Messaging apps.
+
+          Video calls.
+
+          Social media.
+
+          Email.
+
+          Cloud services.
+
+          Even many systems that appear completely separate from the internet depend on online communication somewhere behind the scenes.
+
+          Suddenly, billions of people would be forced back into a world where information moves much more slowly.
+
+          Then another problem would become obvious.
+
+          Money.
+
+          Today, we rarely think about how much of our financial life depends on connected computer systems.
 
           Credit cards.
+
+          Debit cards.
 
           Mobile payments.
 
@@ -162,107 +207,217 @@ jobs:
 
           Digital wallets.
 
-          All of them depend on networks communicating with one another.
+          Automated transactions.
 
-          And when those networks disappear, moving money becomes much harder.
+          All of these systems depend on computers communicating with other computers.
 
-          Cash suddenly becomes extremely valuable.
+          If that communication stopped, paying for things could become extremely difficult.
 
-          But the problems don't stop at banks.
+          Imagine walking into a grocery store.
 
-          Modern supply chains are built around constant communication.
+          You fill your cart.
 
-          Trucks need schedules.
+          You reach the checkout.
 
-          Warehouses need inventory systems.
+          And then your card doesn't work.
 
-          Stores need payment networks.
+          The cashier tries again.
 
-          Manufacturers need suppliers.
+          Still nothing.
 
-          And all of those systems depend on data moving continuously around the world.
+          Suddenly, the cash in your wallet becomes much more valuable.
 
-          When that communication stops, the physical world begins to slow down.
+          ATMs could also become unavailable.
 
-          Cities would feel strangely different.
+          People would begin looking for physical cash.
 
-          Traffic systems lose connectivity.
+          Stores would have to decide how to handle customers when their electronic payment systems no longer function.
 
-          Navigation apps stop updating.
+          And this is where the internet outage would begin affecting the physical world.
 
-          Ride sharing disappears.
+          Because the internet isn't only about websites.
 
-          People who normally depend on digital maps suddenly have to remember where they are going.
+          It connects businesses, warehouses, transportation companies, manufacturers, banks, hospitals, and countless other systems.
 
-          And the most surprising part is how quickly people would begin adapting.
+          Modern supply chains depend on information moving constantly.
 
-          Humans have lived without the internet for thousands of years.
+          A warehouse needs to know what inventory is available.
 
-          Within hours, people would start looking for older solutions.
+          A truck needs to know where it is going.
+
+          A store needs to know what products are arriving.
+
+          A manufacturer needs to know which parts are available.
+
+          Remove the communication between those systems, and the physical movement of goods begins to slow down.
+
+          At first, the shelves in stores might look completely normal.
+
+          But as the hours passed, the difference would become noticeable.
+
+          Deliveries would be delayed.
+
+          Inventory systems might stop updating.
+
+          Businesses would have difficulty coordinating shipments.
+
+          And people would start buying whatever they believed they might need.
+
+          Cities would feel different too.
+
+          Navigation applications would stop receiving updates.
+
+          Ride-sharing services would disappear.
+
+          Food delivery applications would stop working.
+
+          Many people who normally depend on digital maps would suddenly have to remember how to get somewhere.
+
+          Traffic systems could also experience problems depending on how heavily they rely on network connectivity.
+
+          But something surprising would happen at the same time.
+
+          A lot of things would continue working.
+
+          Electricity would not suddenly disappear simply because the public internet was gone.
+
+          Water systems would continue operating.
+
+          Cars could still drive.
+
+          Many factories could continue operating with local systems.
+
+          Hospitals would still have emergency procedures.
+
+          And people would still be able to meet face to face.
+
+          Humans lived for thousands of years without the internet.
+
+          So within a few hours, people would begin rediscovering older solutions.
 
           Printed maps would suddenly become useful again.
 
           Radio would become important.
 
-          Landline phones would matter.
+          Landline telephones would become more valuable.
 
-          People would simply start talking to each other again.
+          Businesses would start using paper records.
 
-          The world would begin rediscovering its analog backup systems.
+          People would begin writing things down.
 
-          And surprisingly, a lot of things would continue working.
+          And perhaps most importantly, people would simply start talking to each other again.
 
-          Electricity doesn't require the public internet to exist.
+          Neighborhoods might become surprisingly active.
 
-          Many vehicles can still drive.
+          People would walk outside to find out what was happening.
 
-          Water systems can continue operating.
+          They would ask their neighbors.
 
-          Hospitals have offline procedures.
+          They would share information.
 
-          And people can still meet face to face.
+          Someone with a working radio might become the most informed person on the block.
 
-          But there would be a massive cost.
+          And while ordinary people adapted, companies would be facing a much bigger problem.
 
-          The internet isn't just a collection of websites.
+          Productivity would collapse in industries that depend heavily on cloud services.
 
-          It has become part of the infrastructure behind modern life.
+          Employees who normally work remotely would lose access to their systems.
 
-          Businesses would lose productivity.
+          Customer service operations could stop functioning.
 
-          Financial transactions would be delayed.
+          Online advertising would disappear.
 
-          Deliveries would stop.
+          E-commerce would effectively freeze.
 
-          Communication would become slower.
+          Financial markets could face serious disruption.
 
-          And the longer the outage continued, the larger the economic impact would become.
+          And companies that rely on real-time data would suddenly be operating with incomplete information.
 
-          Then, after twenty-four hours, something interesting would happen.
+          The economic consequences would grow with every hour.
 
-          The internet would return.
+          One hour might be inconvenient.
 
-          Servers would reconnect.
+          Six hours would be disruptive.
 
-          Messages would begin arriving.
+          Twelve hours could become expensive.
 
-          Payments would start processing.
+          Twenty-four hours would become a major global event.
 
-          And billions of people would suddenly discover how many things they had been waiting for.
+          But then comes the most interesting part.
 
-          But the biggest lesson would not be that the internet is fragile.
+          The internet comes back.
 
-          It would be that modern society has quietly built itself around a system most of us barely notice.
+          Suddenly, phones begin receiving messages.
 
-          We don't think about the internet when it works.
+          Emails start arriving.
 
-          We only notice how important it is when it disappears.
+          Bank transactions begin processing.
 
-          So the next time your Wi-Fi stops working for thirty seconds, remember.
+          Websites load again.
 
-          You're not just losing a connection.
+          Social media comes back to life.
 
-          You're briefly seeing what the world would look like without the invisible network holding so much of it together.
+          Notifications that had been waiting for hours appear all at once.
+
+          People would probably celebrate.
+
+          But they would also discover something important.
+
+          During those twenty-four hours, they had been reminded just how much modern life depends on an invisible network.
+
+          We rarely think about the internet when it works.
+
+          It is simply there.
+
+          We use it to communicate.
+
+          To work.
+
+          To shop.
+
+          To travel.
+
+          To pay.
+
+          To entertain ourselves.
+
+          And to connect billions of devices around the planet.
+
+          The internet has become more than a collection of websites.
+
+          It has become part of the infrastructure of modern civilization.
+
+          So would the world end if the internet disappeared for twenty-four hours?
+
+          Probably not.
+
+          Humans would adapt.
+
+          Older systems would come back into use.
+
+          People would find ways to communicate.
+
+          Businesses would improvise.
+
+          And eventually, the connection would return.
+
+          But the experience would be a powerful reminder.
+
+          The most important systems in our lives are often the ones we barely notice.
+
+          We don't think about electricity until the power goes out.
+
+          We don't think about water until the pipes stop working.
+
+          And we don't think about the internet until the screen suddenly says:
+
+          No connection.
+
+          So the next time your Wi-Fi disappears for thirty seconds, remember.
+
+          You aren't just losing a connection.
+
+          You're getting a tiny glimpse of what the world might feel like if the invisible network connecting modern society suddenly disappeared.
 
           For twenty-four hours, the world wouldn't end.
 
@@ -270,15 +425,19 @@ jobs:
 
           EOF
 
+          echo "Narration script created."
+
+          WORDS=$(wc -w < audio/narration.txt)
+
+          echo "Narration word count: $WORDS"
+
 
       # ============================================================
-      # 11. GENERATE AI NARRATION
+      # 11. GENERATE NARRATION
       # ============================================================
 
       - name: 🎙️ Generate AI narration
         run: |
-
-          mkdir -p audio/voice
 
           python3 -m piper.download_voices \
             en_US-lessac-medium \
@@ -293,219 +452,14 @@ jobs:
           echo "Narration generated."
 
           ffprobe \
-            -hide_banner \
+            -v error \
+            -show_entries format=duration \
+            -of default=noprint_wrappers=1:nokey=1 \
             audio/narration.wav
 
 
       # ============================================================
-      # 12. GENERATE BACKGROUND MUSIC
-      # ============================================================
-
-      - name: 🎵 Generate cinematic background music
-        run: |
-
-          cat > generate_music.py <<'PY'
-
-          import math
-          import wave
-          import struct
-
-          SAMPLE_RATE = 44100
-
-          # 310 seconds gives us enough music for the
-          # approximately 5-minute video.
-          DURATION = 310
-
-          MASTER_VOLUME = 0.045
-
-          # Cinematic progression:
-          #
-          # Am -> F -> C -> G
-          #
-          progression = [
-              [110.00, 130.81, 164.81],
-              [87.31, 110.00, 130.81],
-              [130.81, 164.81, 196.00],
-              [98.00, 123.47, 146.83],
-          ]
-
-          CHORD_LENGTH = 8.0
-
-          output = wave.open(
-              "audio/background_music.wav",
-              "w"
-          )
-
-          output.setnchannels(2)
-          output.setsampwidth(2)
-          output.setframerate(SAMPLE_RATE)
-
-          total_samples = SAMPLE_RATE * DURATION
-
-          for i in range(total_samples):
-
-              t = i / SAMPLE_RATE
-
-              chord_index = (
-                  int(t / CHORD_LENGTH)
-                  % len(progression)
-              )
-
-              chord = progression[chord_index]
-
-              local = (
-                  (t % CHORD_LENGTH)
-                  / CHORD_LENGTH
-              )
-
-              # Smooth chord envelope.
-              fade_in = min(1.0, local * 10.0)
-              fade_out = min(1.0, (1.0 - local) * 10.0)
-
-              envelope = fade_in * fade_out
-
-              sample = 0.0
-
-              for frequency in chord:
-
-                  modulation = (
-                      1.0
-                      + 0.002
-                      * math.sin(
-                          2.0
-                          * math.pi
-                          * 0.08
-                          * t
-                      )
-                  )
-
-                  sample += (
-                      math.sin(
-                          2.0
-                          * math.pi
-                          * frequency
-                          * modulation
-                          * t
-                      )
-                      / len(chord)
-                  )
-
-              # Very subtle harmonic.
-              sample += (
-                  0.06
-                  * math.sin(
-                      2.0
-                      * math.pi
-                      * 440.0
-                      * t
-                  )
-              )
-
-              sample *= MASTER_VOLUME
-              sample *= envelope
-
-              # Slow stereo movement.
-              stereo = math.sin(
-                  2.0
-                  * math.pi
-                  * 0.03
-                  * t
-              )
-
-              left = sample * (1.0 + 0.08 * stereo)
-              right = sample * (1.0 - 0.08 * stereo)
-
-              left = max(-1.0, min(1.0, left))
-              right = max(-1.0, min(1.0, right))
-
-              output.writeframes(
-                  struct.pack(
-                      "<hh",
-                      int(left * 32767),
-                      int(right * 32767)
-                  )
-              )
-
-          output.close()
-
-          print("Background music generated.")
-
-          PY
-
-          python3 generate_music.py
-
-          ffprobe \
-            -hide_banner \
-            audio/background_music.wav
-
-
-      # ============================================================
-      # 13. GENERATE SOUND EFFECTS
-      # ============================================================
-
-      - name: 🔊 Generate sound effects
-        run: |
-
-          # --------------------------------------------------------
-          # Digital notification
-          # --------------------------------------------------------
-
-          ffmpeg -y \
-            -f lavfi \
-            -i "sine=frequency=880:duration=0.18" \
-            -af "afade=t=out:st=0.08:d=0.10,volume=0.18" \
-            audio/sfx/notification.wav
-
-
-          # --------------------------------------------------------
-          # Network failure tone
-          # --------------------------------------------------------
-
-          ffmpeg -y \
-            -f lavfi \
-            -i "sine=frequency=700:duration=0.8" \
-            -af "afade=t=in:st=0:d=0.05,afade=t=out:st=0.45:d=0.35,volume=0.16" \
-            audio/sfx/network_failure.wav
-
-
-          # --------------------------------------------------------
-          # Payment beep
-          # --------------------------------------------------------
-
-          ffmpeg -y \
-            -f lavfi \
-            -i "sine=frequency=1200:duration=0.12" \
-            -af "afade=t=out:st=0.04:d=0.08,volume=0.16" \
-            audio/sfx/payment.wav
-
-
-          # --------------------------------------------------------
-          # Radio static
-          # --------------------------------------------------------
-
-          ffmpeg -y \
-            -f lavfi \
-            -i "anoisesrc=color=pink:duration=1.5:amplitude=0.15" \
-            -af "highpass=f=500,lowpass=f=4000,afade=t=in:st=0:d=0.2,afade=t=out:st=1.1:d=0.4,volume=0.30" \
-            audio/sfx/radio.wav
-
-
-          # --------------------------------------------------------
-          # City ambience
-          # --------------------------------------------------------
-
-          ffmpeg -y \
-            -f lavfi \
-            -i "anoisesrc=color=brown:duration=8:amplitude=0.04" \
-            -af "lowpass=f=180,volume=0.60" \
-            audio/sfx/city.wav
-
-
-          echo "All sound effects generated."
-
-
-      # ============================================================
-      # 14. START VIDEO APPLICATION
+      # 12. START VIDEO APPLICATION
       # ============================================================
 
       - name: 🚀 Start video application
@@ -516,9 +470,6 @@ jobs:
 
           export PORT=5173
           export BASE_PATH=/
-
-          echo "PORT=$PORT"
-          echo "BASE_PATH=$BASE_PATH"
 
           pnpm dev \
             --host 0.0.0.0 \
@@ -546,7 +497,7 @@ jobs:
 
 
       # ============================================================
-      # 15. WAIT FOR APPLICATION
+      # 13. WAIT FOR APPLICATION
       # ============================================================
 
       - name: ⏳ Wait for application
@@ -568,7 +519,7 @@ jobs:
 
           done
 
-          echo "Application failed to start:"
+          echo "Application failed to start."
 
           cat /tmp/video-app.log
 
@@ -576,13 +527,11 @@ jobs:
 
 
       # ============================================================
-      # 16. RECORD VIDEO
+      # 14. RECORD VIDEO
       # ============================================================
 
-      - name: 🎥 Record 5-minute video
+      - name: 🎥 Record video
         run: |
-
-          mkdir -p render
 
           cat > render-video.mjs <<'EOF'
 
@@ -623,19 +572,13 @@ jobs:
 
           console.log("Video loaded.");
 
-          // Allow animation to initialize.
           await page.waitForTimeout(5000);
 
-          console.log(
-            "Recording 5-minute video..."
-          );
+          console.log("Recording approximately 5 minutes...");
 
-          // Existing animation duration.
           await page.waitForTimeout(300000);
 
-          console.log(
-            "Recording finished."
-          );
+          console.log("Recording finished.");
 
           const video = page.video();
 
@@ -654,43 +597,320 @@ jobs:
 
 
       # ============================================================
-      # 17. FIND AND CONVERT WEBM
+      # 15. MEASURE VIDEO DURATION
       # ============================================================
 
-      - name: 🎬 Convert video to MP4
+      - name: ⏱️ Measure video duration
         run: |
 
           WEBM_FILE=$(find render -name "*.webm" | head -1)
 
           if [ -z "$WEBM_FILE" ]; then
-            echo "ERROR: No WebM file was created."
+            echo "ERROR: No WebM video found."
             exit 1
           fi
 
-          echo "WebM file:"
+          echo "Video file:"
           echo "$WEBM_FILE"
 
-          ffmpeg \
-            -y \
-            -i "$WEBM_FILE" \
-            -c:v libx264 \
-            -preset fast \
-            -crf 18 \
-            -pix_fmt yuv420p \
-            -an \
-            render/video-only.mp4
+          VIDEO_DURATION=$(ffprobe \
+            -v error \
+            -show_entries format=duration \
+            -of default=noprint_wrappers=1:nokey=1 \
+            "$WEBM_FILE")
 
-          echo "Video-only MP4 created."
+          echo "Video duration:"
+          echo "$VIDEO_DURATION seconds"
+
+          VIDEO_DURATION_INT=$(printf "%.0f" "$VIDEO_DURATION")
+
+          echo "Rounded video duration:"
+          echo "$VIDEO_DURATION_INT seconds"
+
+          echo "VIDEO_DURATION=$VIDEO_DURATION" >> "$GITHUB_ENV"
+          echo "VIDEO_DURATION_INT=$VIDEO_DURATION_INT" >> "$GITHUB_ENV"
+          echo "WEBM_FILE=$WEBM_FILE" >> "$GITHUB_ENV"
 
 
       # ============================================================
-      # 18. CREATE FINAL AUDIO MIX
+      # 16. CHECK NARRATION DURATION
       # ============================================================
 
-      - name: 🎧 Mix narration, music and sound effects
+      - name: 🔎 Check narration duration
         run: |
 
-          echo "Creating final soundtrack..."
+          NARRATION_DURATION=$(ffprobe \
+            -v error \
+            -show_entries format=duration \
+            -of default=noprint_wrappers=1:nokey=1 \
+            audio/narration.wav)
+
+          echo "Narration duration:"
+          echo "$NARRATION_DURATION seconds"
+
+          echo "NARRATION_DURATION=$NARRATION_DURATION" >> "$GITHUB_ENV"
+
+          python3 - <<'PY'
+
+          import os
+
+          video = float(os.environ["VIDEO_DURATION"])
+          narration = float(os.environ["NARRATION_DURATION"])
+
+          print(f"Video:     {video:.2f} seconds")
+          print(f"Narration: {narration:.2f} seconds")
+
+          # Require narration to cover at least 95%
+          # of the video.
+
+          required = video * 0.95
+
+          if narration < required:
+
+              print()
+              print("ERROR: Narration is too short.")
+              print(
+                  f"Required at least {required:.2f} seconds."
+              )
+              print(
+                  f"Only {narration:.2f} seconds generated."
+              )
+
+              raise SystemExit(1)
+
+          print()
+          print("Narration duration check PASSED.")
+
+          PY
+
+
+      # ============================================================
+      # 17. GENERATE BACKGROUND MUSIC FOR EXACT VIDEO LENGTH
+      # ============================================================
+
+      - name: 🎵 Generate exact-length background music
+        run: |
+
+          python3 - <<'PY'
+
+          import math
+          import wave
+          import struct
+          import os
+
+          sample_rate = 44100
+
+          duration = float(
+              os.environ["VIDEO_DURATION"]
+          )
+
+          total_samples = int(
+              sample_rate * duration
+          )
+
+          master_volume = 0.035
+
+          progression = [
+
+              [110.00, 130.81, 164.81],
+
+              [87.31, 110.00, 130.81],
+
+              [130.81, 164.81, 196.00],
+
+              [98.00, 123.47, 146.83]
+
+          ]
+
+          chord_length = 8.0
+
+          output = wave.open(
+              "audio/background_music.wav",
+              "w"
+          )
+
+          output.setnchannels(2)
+          output.setsampwidth(2)
+          output.setframerate(sample_rate)
+
+          for i in range(total_samples):
+
+              t = i / sample_rate
+
+              chord_index = (
+                  int(t / chord_length)
+                  % len(progression)
+              )
+
+              chord = progression[chord_index]
+
+              local = (
+                  (t % chord_length)
+                  / chord_length
+              )
+
+              fade_in = min(
+                  1.0,
+                  local * 8.0
+              )
+
+              fade_out = min(
+                  1.0,
+                  (1.0 - local) * 8.0
+              )
+
+              envelope = fade_in * fade_out
+
+              sample = 0.0
+
+              for frequency in chord:
+
+                  modulation = (
+                      1.0
+                      +
+                      0.002 *
+                      math.sin(
+                          2 *
+                          math.pi *
+                          0.08 *
+                          t
+                      )
+                  )
+
+                  sample += (
+                      math.sin(
+                          2 *
+                          math.pi *
+                          frequency *
+                          modulation *
+                          t
+                      )
+                      / len(chord)
+                  )
+
+              sample += (
+                  0.04 *
+                  math.sin(
+                      2 *
+                      math.pi *
+                      440 *
+                      t
+                  )
+              )
+
+              sample *= master_volume
+              sample *= envelope
+
+              stereo = math.sin(
+                  2 *
+                  math.pi *
+                  0.03 *
+                  t
+              )
+
+              left = sample * (
+                  1 +
+                  0.08 * stereo
+              )
+
+              right = sample * (
+                  1 -
+                  0.08 * stereo
+              )
+
+              left = max(
+                  -1,
+                  min(1, left)
+              )
+
+              right = max(
+                  -1,
+                  min(1, right)
+              )
+
+              output.writeframes(
+                  struct.pack(
+                      "<hh",
+                      int(left * 32767),
+                      int(right * 32767)
+                  )
+              )
+
+          output.close()
+
+          print(
+              f"Music generated for {duration:.2f} seconds."
+          )
+
+          PY
+
+          ffprobe \
+            -v error \
+            -show_entries format=duration \
+            -of default=noprint_wrappers=1:nokey=1 \
+            audio/background_music.wav
+
+
+      # ============================================================
+      # 18. GENERATE SFX
+      # ============================================================
+
+      - name: 🔊 Generate sound effects
+        run: |
+
+          # Notification
+
+          ffmpeg -y \
+            -f lavfi \
+            -i "sine=frequency=880:duration=0.18" \
+            -af "afade=t=out:st=0.08:d=0.10,volume=0.18" \
+            audio/sfx/notification.wav
+
+
+          # Network failure
+
+          ffmpeg -y \
+            -f lavfi \
+            -i "sine=frequency=700:duration=0.8" \
+            -af "afade=t=in:st=0:d=0.05,afade=t=out:st=0.45:d=0.35,volume=0.16" \
+            audio/sfx/network_failure.wav
+
+
+          # Payment beep
+
+          ffmpeg -y \
+            -f lavfi \
+            -i "sine=frequency=1200:duration=0.12" \
+            -af "afade=t=out:st=0.04:d=0.08,volume=0.16" \
+            audio/sfx/payment.wav
+
+
+          # Radio static
+
+          ffmpeg -y \
+            -f lavfi \
+            -i "anoisesrc=color=pink:duration=1.5:amplitude=0.15" \
+            -af "highpass=f=500,lowpass=f=4000,afade=t=in:st=0:d=0.2,afade=t=out:st=1.1:d=0.4,volume=0.30" \
+            audio/sfx/radio.wav
+
+
+          # City ambience
+
+          ffmpeg -y \
+            -f lavfi \
+            -i "anoisesrc=color=brown:duration=8:amplitude=0.04" \
+            -af "lowpass=f=180,volume=0.60" \
+            audio/sfx/city.wav
+
+
+      # ============================================================
+      # 19. CREATE FINAL SOUNDTRACK
+      # ============================================================
+
+      - name: 🎧 Mix complete soundtrack
+        run: |
+
+          echo "Mixing narration + music + SFX..."
 
           ffmpeg \
             -y \
@@ -705,48 +925,46 @@ jobs:
 
               [0:a]
               loudnorm=I=-16:TP=-1.5:LRA=11,
-              volume=1.0,
-              apad=pad_dur=305
+              volume=1.0
               [voice];
 
               [1:a]
-              atrim=duration=305,
-              volume=0.25
+              volume=0.24
               [music];
 
               [2:a]
               adelay=5000|5000,
-              volume=0.45
+              volume=0.40
               [notification];
 
               [3:a]
               adelay=38000|38000,
-              volume=0.50
+              volume=0.45
               [failure];
 
               [4:a]
               adelay=65000|65000,
-              volume=0.35
+              volume=0.30
               [payment1];
 
               [4:a]
               adelay=70000|70000,
-              volume=0.30
+              volume=0.25
               [payment2];
 
               [5:a]
               adelay=160000|160000,
-              volume=0.25
+              volume=0.22
               [radio];
 
               [6:a]
               adelay=115000|115000,
-              volume=0.18
+              volume=0.15
               [city1];
 
               [6:a]
               adelay=190000|190000,
-              volume=0.16
+              volume=0.12
               [city2];
 
               [voice]
@@ -764,35 +982,47 @@ jobs:
               duration=first:
               dropout_transition=2,
 
-              loudnorm=
-              I=-16:
-              TP=-1.5:
-              LRA=11
+              loudnorm=I=-16:TP=-1.5:LRA=11
 
-              [finalaudio]
+              [final]
 
             " \
-            -map "[finalaudio]" \
+            -map "[final]" \
             -c:a pcm_s16le \
             -ar 48000 \
             -ac 2 \
             audio/final-soundtrack.wav
 
+
           echo "Final soundtrack created."
 
-          ffprobe \
-            -hide_banner \
-            audio/final-soundtrack.wav
-
 
       # ============================================================
-      # 19. COMBINE VIDEO + FINAL SOUNDTRACK
+      # 20. CONVERT VIDEO
       # ============================================================
 
-      - name: 🎬 Create final YouTube MP4
+      - name: 🎬 Convert video to MP4
         run: |
 
-          echo "Combining video and soundtrack..."
+          ffmpeg \
+            -y \
+            -i "$WEBM_FILE" \
+            -c:v libx264 \
+            -preset fast \
+            -crf 18 \
+            -pix_fmt yuv420p \
+            -an \
+            render/video-only.mp4
+
+
+      # ============================================================
+      # 21. COMBINE VIDEO + AUDIO
+      # ============================================================
+
+      - name: 🎬 Create final single MP4
+        run: |
+
+          echo "Creating final video..."
 
           ffmpeg \
             -y \
@@ -805,63 +1035,69 @@ jobs:
             -b:a 192k \
             -ar 48000 \
             -ac 2 \
-            -t 305 \
+            -t "$VIDEO_DURATION" \
             -movflags +faststart \
             render/24-hours-without-internet.mp4
 
-          echo ""
+
+      # ============================================================
+      # 22. VERIFY FINAL VIDEO
+      # ============================================================
+
+      - name: ✅ Verify final MP4
+        run: |
+
           echo "=========================================="
-          echo "FINAL VIDEO CREATED SUCCESSFULLY"
+          echo "FINAL VIDEO"
           echo "=========================================="
 
           ffprobe \
             -hide_banner \
             render/24-hours-without-internet.mp4
 
+          echo ""
+          echo "=========================================="
+          echo "CHECKING VIDEO STREAM"
+          echo "=========================================="
+
+          ffprobe \
+            -v error \
+            -select_streams v:0 \
+            -show_entries stream=codec_name,width,height \
+            -of default=noprint_wrappers=1 \
+            render/24-hours-without-internet.mp4
+
+          echo ""
+          echo "=========================================="
+          echo "CHECKING AUDIO STREAM"
+          echo "=========================================="
+
+          ffprobe \
+            -v error \
+            -select_streams a:0 \
+            -show_entries stream=codec_name,sample_rate,channels \
+            -of default=noprint_wrappers=1 \
+            render/24-hours-without-internet.mp4
+
+          echo ""
+          echo "=========================================="
+          echo "FINAL VIDEO DURATION"
+          echo "=========================================="
+
+          ffprobe \
+            -v error \
+            -show_entries format=duration \
+            -of default=noprint_wrappers=1:nokey=1 \
+            render/24-hours-without-internet.mp4
+
 
       # ============================================================
-      # 20. UPLOAD FINAL VIDEO
+      # 23. UPLOAD ONLY ONE ARTIFACT
       # ============================================================
 
-      - name: 📤 Upload final YouTube video
+      - name: 📤 Upload FINAL VIDEO
         uses: actions/upload-artifact@v4
         with:
-          name: 24-hours-without-internet-full-audio
+          name: 24-hours-without-internet-FINAL
           path: render/24-hours-without-internet.mp4
-          retention-days: 7
-
-
-      # ============================================================
-      # 21. UPLOAD NARRATION
-      # ============================================================
-
-      - name: 📤 Upload narration backup
-        uses: actions/upload-artifact@v4
-        with:
-          name: 24-hours-without-internet-narration
-          path: audio/narration.wav
-          retention-days: 7
-
-
-      # ============================================================
-      # 22. UPLOAD MUSIC
-      # ============================================================
-
-      - name: 📤 Upload music backup
-        uses: actions/upload-artifact@v4
-        with:
-          name: 24-hours-without-internet-background-music
-          path: audio/background_music.wav
-          retention-days: 7
-
-
-      # ============================================================
-      # 23. UPLOAD FINAL SOUNDTRACK
-      # ============================================================
-
-      - name: 📤 Upload final soundtrack
-        uses: actions/upload-artifact@v4
-        with:
-          name: 24-hours-without-internet-final-soundtrack
-          path: audio/final-soundtrack.wav
           retention-days: 7
