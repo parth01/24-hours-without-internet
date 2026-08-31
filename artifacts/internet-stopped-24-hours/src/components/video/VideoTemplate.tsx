@@ -1,5 +1,6 @@
-import { useVideoPlayer } from '@/lib/video';
+import { VideoPausedContext, useVideoPlayer } from '@/lib/video';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, type ComponentType } from 'react';
 
 import { Scene01 } from './video_scenes/Scene01';
 import { Scene02 } from './video_scenes/Scene02';
@@ -14,7 +15,7 @@ import { Scene10 } from './video_scenes/Scene10';
 import { Scene11 } from './video_scenes/Scene11';
 import { Scene12 } from './video_scenes/Scene12';
 
-const SCENE_DURATIONS = {
+export const SCENE_DURATIONS = {
   scene01: 16_000,
   scene02: 22_000,
   scene03: 26_000,
@@ -29,31 +30,50 @@ const SCENE_DURATIONS = {
   scene12: 34_000,
 };
 
-const SCENES = [
-  Scene01,
-  Scene02,
-  Scene03,
-  Scene04,
-  Scene05,
-  Scene06,
-  Scene07,
-  Scene08,
-  Scene09,
-  Scene10,
-  Scene11,
-  Scene12,
-];
+const SCENE_COMPONENTS: Record<string, ComponentType> = {
+  scene01: Scene01,
+  scene02: Scene02,
+  scene03: Scene03,
+  scene04: Scene04,
+  scene05: Scene05,
+  scene06: Scene06,
+  scene07: Scene07,
+  scene08: Scene08,
+  scene09: Scene09,
+  scene10: Scene10,
+  scene11: Scene11,
+  scene12: Scene12,
+};
 
-export default function VideoTemplate() {
-  const { currentScene, currentSceneKey } = useVideoPlayer({
-    durations: SCENE_DURATIONS,
+export default function VideoTemplate({
+  durations = SCENE_DURATIONS,
+  loop = true,
+  paused = false,
+  onSceneChange,
+}: {
+  durations?: Record<string, number>;
+  loop?: boolean;
+  paused?: boolean;
+  onSceneChange?: (sceneKey: string) => void;
+} = {}) {
+  const { currentSceneKey } = useVideoPlayer({
+    durations,
+    loop,
+    paused,
   });
-  const ActiveScene = SCENES[currentScene] ?? Scene01;
+  const baseSceneKey = currentSceneKey.replace(/_r[12]$/, '');
+  const sceneIndex = Object.keys(SCENE_DURATIONS).indexOf(baseSceneKey);
+  const ActiveScene = SCENE_COMPONENTS[baseSceneKey] ?? Scene01;
+
+  useEffect(() => {
+    onSceneChange?.(currentSceneKey);
+  }, [currentSceneKey, onSceneChange]);
 
   return (
-    <div
-      className="video-grain relative h-screen w-full overflow-hidden bg-[#0d1117]"
-    >
+    <VideoPausedContext.Provider value={paused}>
+      <div
+        className="video-grain relative h-screen w-full overflow-hidden bg-[#0d1117]"
+      >
       <motion.div
         className="pointer-events-none absolute inset-0 z-0"
         animate={{
@@ -69,9 +89,9 @@ export default function VideoTemplate() {
       <motion.div
         className="pointer-events-none absolute -left-[15vw] top-[16vh] z-[2] h-[35vw] w-[35vw] rounded-full border border-[#f4f0e8]/10"
         animate={{
-          x: currentScene % 3 === 0 ? '8vw' : currentScene % 3 === 1 ? '24vw' : '42vw',
-          y: currentScene % 2 === 0 ? '2vh' : '14vh',
-          scale: currentScene === 11 ? 1.4 : 1,
+          x: sceneIndex % 3 === 0 ? '8vw' : sceneIndex % 3 === 1 ? '24vw' : '42vw',
+          y: sceneIndex % 2 === 0 ? '2vh' : '14vh',
+          scale: sceneIndex === 11 ? 1.4 : 1,
         }}
         transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
       />
@@ -88,12 +108,17 @@ export default function VideoTemplate() {
         <div className="flex items-center gap-[1vw]">
           <span className="mono text-[.6vw] uppercase tracking-[.18em] text-[#707781]">{currentSceneKey.replace('scene', 'beat ')}</span>
           <div className="flex gap-[.28vw]">
-            {SCENES.map((_, index) => (
+            {Object.keys(SCENE_DURATIONS).map((key, index) => (
               <motion.span
-                key={index}
+                key={key}
                 className="h-[.22vw] w-[1.05vw]"
-                animate={{ backgroundColor: index <= currentScene ? '#ff5b38' : 'rgba(244,240,232,.2)' }}
-                transition={{ duration: .35 }}
+                animate={{
+                  backgroundColor:
+                    index <= sceneIndex
+                      ? '#ff5b38'
+                      : 'rgba(244,240,232,.2)',
+                }}
+                transition={{ duration: 0.35 }}
               />
             ))}
           </div>
@@ -102,6 +127,7 @@ export default function VideoTemplate() {
       <AnimatePresence mode="sync" initial={false}>
         <ActiveScene key={currentSceneKey} />
       </AnimatePresence>
-    </div>
+      </div>
+    </VideoPausedContext.Provider>
   );
 }
