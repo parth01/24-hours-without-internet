@@ -31,7 +31,19 @@ jobs:
       - name: 🚀 Start video application
         working-directory: artifacts/internet-stopped-24-hours
         run: |
+          echo "Starting video application..."
           pnpm dev --host 0.0.0.0 > /tmp/video-app.log 2>&1 &
+          echo $! > /tmp/video-app.pid
+          sleep 10
+
+          echo "===== VIDEO APP LOG ====="
+          cat /tmp/video-app.log
+          echo "========================="
+
+          if ! kill -0 $(cat /tmp/video-app.pid) 2>/dev/null; then
+            echo "Video application failed to start."
+            exit 1
+          fi
 
       - name: ⏳ Wait for application
         run: |
