@@ -1,0 +1,29 @@
+kind = "video"
+previewPath = "/internet-stopped-24-hours/"
+title = "24 Hours Without Internet"
+description = "A five-minute animated explainer exploring what would happen if the internet suddenly stopped working for one full day, from the first minute of confusion through the recovery timeline."
+version = "1.0.0"
+id = "artifacts/internet-stopped-24-hours"
+router = "path"
+videoAspectRatio = "16:9"
+
+[[services]]
+name = "web"
+paths = [ "/internet-stopped-24-hours/" ]
+localPort = 25567
+
+[services.development]
+run = "pnpm --filter @workspace/internet-stopped-24-hours run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/internet-stopped-24-hours", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/internet-stopped-24-hours/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25567"
+BASE_PATH = "/internet-stopped-24-hours/"
