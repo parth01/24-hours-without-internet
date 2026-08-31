@@ -1,4 +1,4 @@
-name: 🎬 Render 24 Hours Without Internet
+name: 🎬 Render 24 Hours Without Internet - Narrated
 
 on:
   workflow_dispatch:
@@ -6,30 +6,258 @@ on:
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
+
+      # ------------------------------------------------------------
+      # 1. Checkout
+      # ------------------------------------------------------------
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
+      # ------------------------------------------------------------
+      # 2. Node
+      # ------------------------------------------------------------
       - name: 🟢 Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
+      # ------------------------------------------------------------
+      # 3. pnpm
+      # ------------------------------------------------------------
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
+      # ------------------------------------------------------------
+      # 4. Dependencies
+      # ------------------------------------------------------------
       - name: 📦 Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      # ------------------------------------------------------------
+      # 5. Playwright
+      # ------------------------------------------------------------
       - name: 🎭 Install Playwright
         run: |
           pnpm add -Dw playwright@1.55.0
           pnpm exec playwright install --with-deps chromium
 
+      # ------------------------------------------------------------
+      # 6. FFmpeg
+      # ------------------------------------------------------------
+      - name: 🎞️ Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          ffmpeg -version
+
+      # ------------------------------------------------------------
+      # 7. Python + Piper TTS
+      # ------------------------------------------------------------
+      - name: 🐍 Install Python and Piper TTS
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install piper-tts
+
+      # ------------------------------------------------------------
+      # 8. Generate narration script
+      # ------------------------------------------------------------
+      - name: 📝 Create narration script
+        run: |
+          mkdir -p audio
+
+          cat > audio/narration.txt <<'EOF'
+          Imagine waking up tomorrow and discovering something impossible.
+
+          The internet is gone.
+
+          Not slow.
+
+          Not experiencing an outage.
+
+          Completely gone.
+
+          At first, most people wouldn't even realize what had happened.
+
+          Your phone still turns on.
+
+          Your television still works.
+
+          The lights are still on.
+
+          But then you try to open a website.
+
+          Nothing.
+
+          You check social media.
+
+          Nothing.
+
+          You try to send a message.
+
+          Nothing.
+
+          Within minutes, the world begins to realize that this isn't a normal outage.
+
+          The quiet failure is everywhere.
+
+          Banks can't communicate.
+
+          Businesses can't connect.
+
+          Cloud services disappear.
+
+          And billions of devices that quietly depend on the internet suddenly become isolated.
+
+          The world goes offline.
+
+          One of the first things people would notice is money.
+
+          Modern payments depend heavily on connected systems.
+
+          Credit cards.
+
+          Mobile payments.
+
+          Online banking.
+
+          Digital wallets.
+
+          All of them depend on networks communicating with one another.
+
+          And when those networks disappear, moving money becomes much harder.
+
+          Cash suddenly becomes extremely valuable.
+
+          But the problems don't stop at banks.
+
+          Modern supply chains are built around constant communication.
+
+          Trucks need schedules.
+
+          Warehouses need inventory systems.
+
+          Stores need payment networks.
+
+          Manufacturers need suppliers.
+
+          And all of those systems depend on data moving continuously around the world.
+
+          When that communication stops, the physical world begins to slow down.
+
+          Cities would feel strangely different.
+
+          Traffic systems lose connectivity.
+
+          Navigation apps stop updating.
+
+          Ride sharing disappears.
+
+          People who normally depend on digital maps suddenly have to remember where they are going.
+
+          And the most surprising part is how quickly people would begin adapting.
+
+          Humans have lived without the internet for thousands of years.
+
+          Within hours, people would start looking for older solutions.
+
+          Printed maps would suddenly become useful again.
+
+          Radio would become important.
+
+          Landline phones would matter.
+
+          People would simply start talking to each other again.
+
+          The world would begin rediscovering its analog backup systems.
+
+          And surprisingly, a lot of things would continue working.
+
+          Electricity doesn't require the public internet to exist.
+
+          Many vehicles can still drive.
+
+          Water systems can continue operating.
+
+          Hospitals have offline procedures.
+
+          And people can still meet face to face.
+
+          But there would be a massive cost.
+
+          The internet isn't just a collection of websites.
+
+          It has become part of the infrastructure behind modern life.
+
+          Businesses would lose productivity.
+
+          Financial transactions would be delayed.
+
+          Deliveries would stop.
+
+          Communication would become slower.
+
+          And the longer the outage continued, the larger the economic impact would become.
+
+          Then, after twenty-four hours, something interesting would happen.
+
+          The internet would return.
+
+          Servers would reconnect.
+
+          Messages would begin arriving.
+
+          Payments would start processing.
+
+          And billions of people would suddenly discover how many things they had been waiting for.
+
+          But the biggest lesson would not be that the internet is fragile.
+
+          It would be that modern society has quietly built itself around a system most of us barely notice.
+
+          We don't think about the internet when it works.
+
+          We only notice how important it is when it disappears.
+
+          So the next time your Wi-Fi stops working for thirty seconds, remember.
+
+          You're not just losing a connection.
+
+          You're briefly seeing what the world would look like without the invisible network holding so much of it together.
+
+          For twenty-four hours, the world wouldn't end.
+
+          But it would definitely feel very different.
+          EOF
+
+      # ------------------------------------------------------------
+      # 9. Generate narration with Piper
+      # ------------------------------------------------------------
+      - name: 🎙️ Generate AI narration
+        run: |
+          mkdir -p audio/voice
+
+          python3 -m piper.download_voices \
+            en_US-lessac-medium \
+            --data-dir audio/voice
+
+          python3 -m piper \
+            --data-dir audio/voice \
+            -m en_US-lessac-medium \
+            -f audio/narration.wav \
+            < audio/narration.txt
+
+          echo "Narration generated."
+
+          ffprobe audio/narration.wav
+
+      # ------------------------------------------------------------
+      # 10. Start video application
+      # ------------------------------------------------------------
       - name: 🚀 Start video application
         working-directory: artifacts/internet-stopped-24-hours
         run: |
@@ -38,7 +266,11 @@ jobs:
           export PORT=5173
           export BASE_PATH=/
 
+          echo "PORT=$PORT"
+          echo "BASE_PATH=$BASE_PATH"
+
           pnpm dev --host 0.0.0.0 > /tmp/video-app.log 2>&1 &
+
           echo $! > /tmp/video-app.pid
 
           sleep 10
@@ -52,31 +284,36 @@ jobs:
             exit 1
           fi
 
+      # ------------------------------------------------------------
+      # 11. Wait for Vite
+      # ------------------------------------------------------------
       - name: ⏳ Wait for application
         run: |
           for i in {1..60}; do
+
             if curl -s http://127.0.0.1:5173 > /dev/null; then
               echo "Application is ready!"
               exit 0
             fi
+
             sleep 2
+
           done
 
           echo "Application failed to start:"
           cat /tmp/video-app.log
+
           exit 1
 
-      - name: 🎞️ Install FFmpeg
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
-          ffmpeg -version
-      
+      # ------------------------------------------------------------
+      # 12. Record animation
+      # ------------------------------------------------------------
       - name: 🎥 Record 5-minute video
         run: |
           mkdir -p render
 
           cat > render-video.mjs <<'EOF'
+
           import { chromium } from "playwright";
           import { execFileSync } from "child_process";
           import fs from "fs";
@@ -86,10 +323,12 @@ jobs:
           });
 
           const context = await browser.newContext({
+
             viewport: {
               width: 1920,
               height: 1080
             },
+
             recordVideo: {
               dir: "render",
               size: {
@@ -97,12 +336,13 @@ jobs:
                 height: 1080
               }
             }
+
           });
 
           const page = await context.newPage();
 
           console.log("Opening video...");
-          
+
           await page.goto(
             "http://127.0.0.1:5173",
             {
@@ -113,12 +353,16 @@ jobs:
 
           console.log("Video loaded.");
 
-          // Allow the first scene to initialize.
+          /*
+           * Give the first scene time to initialize.
+           */
           await page.waitForTimeout(5000);
 
           console.log("Recording 5-minute video...");
 
-          // 5 minutes + initialization buffer.
+          /*
+           * Existing animation = 300 seconds.
+           */
           await page.waitForTimeout(300000);
 
           console.log("Recording finished.");
@@ -126,16 +370,21 @@ jobs:
           const video = page.video();
 
           await context.close();
+
           await browser.close();
 
           const source = await video.path();
 
           console.log("Recorded:", source);
 
+          /*
+           * Convert browser recording to MP4.
+           */
           execFileSync(
             "ffmpeg",
             [
               "-y",
+
               "-i",
               source,
 
@@ -151,32 +400,66 @@ jobs:
               "-pix_fmt",
               "yuv420p",
 
-              "-movflags",
-              "+faststart",
+              "-an",
 
-              "render/24-hours-without-internet.mp4"
+              "render/video-only.mp4"
             ],
             {
               stdio: "inherit"
             }
           );
 
-          console.log("MP4 created!");
+          console.log("Video-only MP4 created.");
 
-          const stats = fs.statSync(
-            "render/24-hours-without-internet.mp4"
-          );
-
-          console.log(
-            `Video size: ${(stats.size / 1024 / 1024).toFixed(2)} MB`
-          );
           EOF
 
           node render-video.mjs
 
-      - name: 📤 Upload MP4
+      # ------------------------------------------------------------
+      # 13. Mix narration with video
+      # ------------------------------------------------------------
+      - name: 🎧 Add narration to video
+        run: |
+
+          echo "Combining video and narration..."
+
+          ffmpeg \
+            -y \
+            -i render/video-only.mp4 \
+            -i audio/narration.wav \
+            -filter_complex \
+            "[1:a]volume=1.0[a]" \
+            -map 0:v:0 \
+            -map "[a]" \
+            -c:v copy \
+            -c:a aac \
+            -b:a 192k \
+            -shortest \
+            -movflags +faststart \
+            render/24-hours-without-internet.mp4
+
+          echo "Final narrated video created."
+
+          ffprobe \
+            -hide_banner \
+            render/24-hours-without-internet.mp4
+
+      # ------------------------------------------------------------
+      # 14. Upload final MP4
+      # ------------------------------------------------------------
+      - name: 📤 Upload final video
         uses: actions/upload-artifact@v4
         with:
-          name: 24-hours-without-internet-video
+          name: 24-hours-without-internet-narrated-video
           path: render/24-hours-without-internet.mp4
+          retention-days: 7
+
+      # ------------------------------------------------------------
+      # 15. Upload narration separately for backup
+      # ------------------------------------------------------------
+      - name: 📤 Upload narration
+        uses: actions/upload-artifact@v4
+        with:
+          name: 24-hours-without-internet-narration
+          path: audio/narration.wav
           retention-days: 7
