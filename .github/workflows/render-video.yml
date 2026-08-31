@@ -1,0 +1,157 @@
+name: 🎬 Render 24 Hours Without Internet
+
+on:
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: 📦 Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: 🌐 Install Chromium
+        run: pnpm dlx playwright@1.55.0 install --with-deps chromium
+
+      - name: 🚀 Start video application
+        working-directory: artifacts/internet-stopped-24-hours
+        run: |
+          pnpm dev --host 0.0.0.0 > /tmp/video-app.log 2>&1 &
+
+      - name: ⏳ Wait for application
+        run: |
+          for i in {1..60}; do
+            if curl -s http://127.0.0.1:5173 > /dev/null; then
+              echo "Application is ready!"
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Application failed to start:"
+          cat /tmp/video-app.log
+          exit 1
+
+      - name: 🎥 Record 5-minute video
+        run: |
+          mkdir -p render
+
+          cat > render-video.mjs <<'EOF'
+          import { chromium } from "playwright";
+          import { execFileSync } from "child_process";
+          import fs from "fs";
+
+          const browser = await chromium.launch({
+            headless: true
+          });
+
+          const context = await browser.newContext({
+            viewport: {
+              width: 1920,
+              height: 1080
+            },
+            recordVideo: {
+              dir: "render",
+              size: {
+                width: 1920,
+                height: 1080
+              }
+            }
+          });
+
+          const page = await context.newPage();
+
+          console.log("Opening video...");
+          
+          await page.goto(
+            "http://127.0.0.1:5173",
+            {
+              waitUntil: "networkidle",
+              timeout: 120000
+            }
+          );
+
+          console.log("Video loaded.");
+
+          // Allow the first scene to initialize.
+          await page.waitForTimeout(5000);
+
+          console.log("Recording 5-minute video...");
+
+          // 5 minutes + initialization buffer.
+          await page.waitForTimeout(300000);
+
+          console.log("Recording finished.");
+
+          const video = page.video();
+
+          await context.close();
+          await browser.close();
+
+          const source = await video.path();
+
+          console.log("Recorded:", source);
+
+          execFileSync(
+            "ffmpeg",
+            [
+              "-y",
+              "-i",
+              source,
+
+              "-c:v",
+              "libx264",
+
+              "-preset",
+              "fast",
+
+              "-crf",
+              "18",
+
+              "-pix_fmt",
+              "yuv420p",
+
+              "-movflags",
+              "+faststart",
+
+              "render/24-hours-without-internet.mp4"
+            ],
+            {
+              stdio: "inherit"
+            }
+          );
+
+          console.log("MP4 created!");
+
+          const stats = fs.statSync(
+            "render/24-hours-without-internet.mp4"
+          );
+
+          console.log(
+            `Video size: ${(stats.size / 1024 / 1024).toFixed(2)} MB`
+          );
+          EOF
+
+          node render-video.mjs
+
+      - name: 📤 Upload MP4
+        uses: actions/upload-artifact@v4
+        with:
+          name: 24-hours-without-internet-video
+          path: render/24-hours-without-internet.mp4
+          retention-days: 7
