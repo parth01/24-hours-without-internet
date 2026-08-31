@@ -632,7 +632,7 @@ jobs:
           echo "WEBM_FILE=$WEBM_FILE" >> "$GITHUB_ENV"
 
 
-      # ============================================================
+           # ============================================================
       # 16. CHECK NARRATION DURATION
       # ============================================================
 
@@ -648,41 +648,37 @@ jobs:
           echo "Narration duration:"
           echo "$NARRATION_DURATION seconds"
 
-          echo "NARRATION_DURATION=$NARRATION_DURATION" >> "$GITHUB_ENV"
+          python3 - "$NARRATION_DURATION" "$VIDEO_DURATION" <<'PY'
 
-          python3 - <<'PY'
+          import sys
 
-          import os
+          narration = float(sys.argv[1])
+          video = float(sys.argv[2])
 
-          video = float(os.environ["VIDEO_DURATION"])
-          narration = float(os.environ["NARRATION_DURATION"])
-
-          print(f"Video:     {video:.2f} seconds")
-          print(f"Narration: {narration:.2f} seconds")
-
-          # Require narration to cover at least 95%
-          # of the video.
+          print(f"Video duration:     {video:.2f} seconds")
+          print(f"Narration duration: {narration:.2f} seconds")
 
           required = video * 0.95
+
+          print(f"Required minimum:   {required:.2f} seconds")
 
           if narration < required:
 
               print()
-              print("ERROR: Narration is too short.")
+              print("❌ ERROR: Narration is too short.")
               print(
-                  f"Required at least {required:.2f} seconds."
+                  f"Need at least {required:.2f} seconds."
               )
               print(
-                  f"Only {narration:.2f} seconds generated."
+                  f"Only {narration:.2f} seconds available."
               )
 
               raise SystemExit(1)
 
           print()
-          print("Narration duration check PASSED.")
+          print("✅ Narration duration check PASSED.")
 
           PY
-
 
       # ============================================================
       # 17. GENERATE BACKGROUND MUSIC FOR EXACT VIDEO LENGTH
