@@ -32,8 +32,13 @@ jobs:
         working-directory: artifacts/internet-stopped-24-hours
         run: |
           echo "Starting video application..."
-          PORT=5173 pnpm dev --host 0.0.0.0 > /tmp/video-app.log 2>&1 &
+
+          export PORT=5173
+          export BASE_PATH=/
+
+          pnpm dev --host 0.0.0.0 > /tmp/video-app.log 2>&1 &
           echo $! > /tmp/video-app.pid
+
           sleep 10
 
           echo "===== VIDEO APP LOG ====="
