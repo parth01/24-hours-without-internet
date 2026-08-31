@@ -1,4 +1,4 @@
-name: 🎬 Render 24 Hours Without Internet - Narrated
+name: 🎬 Render 24 Hours Without Internet - Full Audio
 
 on:
   workflow_dispatch:
@@ -10,67 +10,102 @@ jobs:
 
     steps:
 
-      # ------------------------------------------------------------
-      # 1. Checkout
-      # ------------------------------------------------------------
+      # ============================================================
+      # 1. CHECKOUT
+      # ============================================================
+
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      # ------------------------------------------------------------
-      # 2. Node
-      # ------------------------------------------------------------
+
+      # ============================================================
+      # 2. NODE
+      # ============================================================
+
       - name: 🟢 Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      # ------------------------------------------------------------
-      # 3. pnpm
-      # ------------------------------------------------------------
+
+      # ============================================================
+      # 3. PNPM
+      # ============================================================
+
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      # ------------------------------------------------------------
-      # 4. Dependencies
-      # ------------------------------------------------------------
+
+      # ============================================================
+      # 4. PROJECT DEPENDENCIES
+      # ============================================================
+
       - name: 📦 Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      # ------------------------------------------------------------
-      # 5. Playwright
-      # ------------------------------------------------------------
+
+      # ============================================================
+      # 5. PLAYWRIGHT
+      # ============================================================
+
       - name: 🎭 Install Playwright
         run: |
           pnpm add -Dw playwright@1.55.0
           pnpm exec playwright install --with-deps chromium
 
-      # ------------------------------------------------------------
-      # 6. FFmpeg
-      # ------------------------------------------------------------
+
+      # ============================================================
+      # 6. FFMPEG
+      # ============================================================
+
       - name: 🎞️ Install FFmpeg
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
           ffmpeg -version
 
-      # ------------------------------------------------------------
-      # 7. Python + Piper TTS
-      # ------------------------------------------------------------
-      - name: 🐍 Install Python and Piper TTS
+
+      # ============================================================
+      # 7. PYTHON
+      # ============================================================
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+
+      # ============================================================
+      # 8. PIPER TTS
+      # ============================================================
+
+      - name: 🎙️ Install Piper TTS
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install piper-tts
 
-      # ------------------------------------------------------------
-      # 8. Generate narration script
-      # ------------------------------------------------------------
-      - name: 📝 Create narration script
+
+      # ============================================================
+      # 9. AUDIO DIRECTORIES
+      # ============================================================
+
+      - name: 📁 Create audio directories
         run: |
           mkdir -p audio
+          mkdir -p audio/sfx
+
+
+      # ============================================================
+      # 10. NARRATION SCRIPT
+      # ============================================================
+
+      - name: 📝 Create narration script
+        run: |
 
           cat > audio/narration.txt <<'EOF'
+
           Imagine waking up tomorrow and discovering something impossible.
 
           The internet is gone.
@@ -232,13 +267,17 @@ jobs:
           For twenty-four hours, the world wouldn't end.
 
           But it would definitely feel very different.
+
           EOF
 
-      # ------------------------------------------------------------
-      # 9. Generate narration with Piper
-      # ------------------------------------------------------------
+
+      # ============================================================
+      # 11. GENERATE AI NARRATION
+      # ============================================================
+
       - name: 🎙️ Generate AI narration
         run: |
+
           mkdir -p audio/voice
 
           python3 -m piper.download_voices \
@@ -253,14 +292,226 @@ jobs:
 
           echo "Narration generated."
 
-          ffprobe audio/narration.wav
+          ffprobe \
+            -hide_banner \
+            audio/narration.wav
 
-      # ------------------------------------------------------------
-      # 10. Start video application
-      # ------------------------------------------------------------
+
+      # ============================================================
+      # 12. GENERATE BACKGROUND MUSIC
+      # ============================================================
+
+      - name: 🎵 Generate cinematic background music
+        run: |
+
+          cat > generate_music.py <<'PY'
+
+          import math
+          import wave
+          import struct
+
+          SAMPLE_RATE = 44100
+
+          # 310 seconds gives us enough music for the
+          # approximately 5-minute video.
+          DURATION = 310
+
+          MASTER_VOLUME = 0.045
+
+          # Cinematic progression:
+          #
+          # Am -> F -> C -> G
+          #
+          progression = [
+              [110.00, 130.81, 164.81],
+              [87.31, 110.00, 130.81],
+              [130.81, 164.81, 196.00],
+              [98.00, 123.47, 146.83],
+          ]
+
+          CHORD_LENGTH = 8.0
+
+          output = wave.open(
+              "audio/background_music.wav",
+              "w"
+          )
+
+          output.setnchannels(2)
+          output.setsampwidth(2)
+          output.setframerate(SAMPLE_RATE)
+
+          total_samples = SAMPLE_RATE * DURATION
+
+          for i in range(total_samples):
+
+              t = i / SAMPLE_RATE
+
+              chord_index = (
+                  int(t / CHORD_LENGTH)
+                  % len(progression)
+              )
+
+              chord = progression[chord_index]
+
+              local = (
+                  (t % CHORD_LENGTH)
+                  / CHORD_LENGTH
+              )
+
+              # Smooth chord envelope.
+              fade_in = min(1.0, local * 10.0)
+              fade_out = min(1.0, (1.0 - local) * 10.0)
+
+              envelope = fade_in * fade_out
+
+              sample = 0.0
+
+              for frequency in chord:
+
+                  modulation = (
+                      1.0
+                      + 0.002
+                      * math.sin(
+                          2.0
+                          * math.pi
+                          * 0.08
+                          * t
+                      )
+                  )
+
+                  sample += (
+                      math.sin(
+                          2.0
+                          * math.pi
+                          * frequency
+                          * modulation
+                          * t
+                      )
+                      / len(chord)
+                  )
+
+              # Very subtle harmonic.
+              sample += (
+                  0.06
+                  * math.sin(
+                      2.0
+                      * math.pi
+                      * 440.0
+                      * t
+                  )
+              )
+
+              sample *= MASTER_VOLUME
+              sample *= envelope
+
+              # Slow stereo movement.
+              stereo = math.sin(
+                  2.0
+                  * math.pi
+                  * 0.03
+                  * t
+              )
+
+              left = sample * (1.0 + 0.08 * stereo)
+              right = sample * (1.0 - 0.08 * stereo)
+
+              left = max(-1.0, min(1.0, left))
+              right = max(-1.0, min(1.0, right))
+
+              output.writeframes(
+                  struct.pack(
+                      "<hh",
+                      int(left * 32767),
+                      int(right * 32767)
+                  )
+              )
+
+          output.close()
+
+          print("Background music generated.")
+
+          PY
+
+          python3 generate_music.py
+
+          ffprobe \
+            -hide_banner \
+            audio/background_music.wav
+
+
+      # ============================================================
+      # 13. GENERATE SOUND EFFECTS
+      # ============================================================
+
+      - name: 🔊 Generate sound effects
+        run: |
+
+          # --------------------------------------------------------
+          # Digital notification
+          # --------------------------------------------------------
+
+          ffmpeg -y \
+            -f lavfi \
+            -i "sine=frequency=880:duration=0.18" \
+            -af "afade=t=out:st=0.08:d=0.10,volume=0.18" \
+            audio/sfx/notification.wav
+
+
+          # --------------------------------------------------------
+          # Network failure tone
+          # --------------------------------------------------------
+
+          ffmpeg -y \
+            -f lavfi \
+            -i "sine=frequency=700:duration=0.8" \
+            -af "afade=t=in:st=0:d=0.05,afade=t=out:st=0.45:d=0.35,volume=0.16" \
+            audio/sfx/network_failure.wav
+
+
+          # --------------------------------------------------------
+          # Payment beep
+          # --------------------------------------------------------
+
+          ffmpeg -y \
+            -f lavfi \
+            -i "sine=frequency=1200:duration=0.12" \
+            -af "afade=t=out:st=0.04:d=0.08,volume=0.16" \
+            audio/sfx/payment.wav
+
+
+          # --------------------------------------------------------
+          # Radio static
+          # --------------------------------------------------------
+
+          ffmpeg -y \
+            -f lavfi \
+            -i "anoisesrc=color=pink:duration=1.5:amplitude=0.15" \
+            -af "highpass=f=500,lowpass=f=4000,afade=t=in:st=0:d=0.2,afade=t=out:st=1.1:d=0.4,volume=0.30" \
+            audio/sfx/radio.wav
+
+
+          # --------------------------------------------------------
+          # City ambience
+          # --------------------------------------------------------
+
+          ffmpeg -y \
+            -f lavfi \
+            -i "anoisesrc=color=brown:duration=8:amplitude=0.04" \
+            -af "lowpass=f=180,volume=0.60" \
+            audio/sfx/city.wav
+
+
+          echo "All sound effects generated."
+
+
+      # ============================================================
+      # 14. START VIDEO APPLICATION
+      # ============================================================
+
       - name: 🚀 Start video application
         working-directory: artifacts/internet-stopped-24-hours
         run: |
+
           echo "Starting video application..."
 
           export PORT=5173
@@ -269,31 +520,48 @@ jobs:
           echo "PORT=$PORT"
           echo "BASE_PATH=$BASE_PATH"
 
-          pnpm dev --host 0.0.0.0 > /tmp/video-app.log 2>&1 &
+          pnpm dev \
+            --host 0.0.0.0 \
+            > /tmp/video-app.log 2>&1 &
 
           echo $! > /tmp/video-app.pid
 
           sleep 10
 
           echo "===== VIDEO APP LOG ====="
+
           cat /tmp/video-app.log
+
           echo "========================="
 
-          if ! kill -0 $(cat /tmp/video-app.pid) 2>/dev/null; then
+          if ! kill -0 \
+            $(cat /tmp/video-app.pid) \
+            2>/dev/null; then
+
             echo "Video application failed to start."
+
             exit 1
+
           fi
 
-      # ------------------------------------------------------------
-      # 11. Wait for Vite
-      # ------------------------------------------------------------
+
+      # ============================================================
+      # 15. WAIT FOR APPLICATION
+      # ============================================================
+
       - name: ⏳ Wait for application
         run: |
+
           for i in {1..60}; do
 
-            if curl -s http://127.0.0.1:5173 > /dev/null; then
+            if curl -s \
+              http://127.0.0.1:5173 \
+              > /dev/null; then
+
               echo "Application is ready!"
+
               exit 0
+
             fi
 
             sleep 2
@@ -301,22 +569,24 @@ jobs:
           done
 
           echo "Application failed to start:"
+
           cat /tmp/video-app.log
 
           exit 1
 
-      # ------------------------------------------------------------
-      # 12. Record animation
-      # ------------------------------------------------------------
+
+      # ============================================================
+      # 16. RECORD VIDEO
+      # ============================================================
+
       - name: 🎥 Record 5-minute video
         run: |
+
           mkdir -p render
 
           cat > render-video.mjs <<'EOF'
 
           import { chromium } from "playwright";
-          import { execFileSync } from "child_process";
-          import fs from "fs";
 
           const browser = await chromium.launch({
             headless: true
@@ -353,19 +623,19 @@ jobs:
 
           console.log("Video loaded.");
 
-          /*
-           * Give the first scene time to initialize.
-           */
+          // Allow animation to initialize.
           await page.waitForTimeout(5000);
 
-          console.log("Recording 5-minute video...");
+          console.log(
+            "Recording 5-minute video..."
+          );
 
-          /*
-           * Existing animation = 300 seconds.
-           */
+          // Existing animation duration.
           await page.waitForTimeout(300000);
 
-          console.log("Recording finished.");
+          console.log(
+            "Recording finished."
+          );
 
           const video = page.video();
 
@@ -373,93 +643,225 @@ jobs:
 
           await browser.close();
 
-          const source = await video.path();
-
-          console.log("Recorded:", source);
-
-          /*
-           * Convert browser recording to MP4.
-           */
-          execFileSync(
-            "ffmpeg",
-            [
-              "-y",
-
-              "-i",
-              source,
-
-              "-c:v",
-              "libx264",
-
-              "-preset",
-              "fast",
-
-              "-crf",
-              "18",
-
-              "-pix_fmt",
-              "yuv420p",
-
-              "-an",
-
-              "render/video-only.mp4"
-            ],
-            {
-              stdio: "inherit"
-            }
+          console.log(
+            "Recorded:",
+            await video.path()
           );
-
-          console.log("Video-only MP4 created.");
 
           EOF
 
           node render-video.mjs
 
-      # ------------------------------------------------------------
-      # 13. Mix narration with video
-      # ------------------------------------------------------------
-      - name: 🎧 Add narration to video
+
+      # ============================================================
+      # 17. FIND AND CONVERT WEBM
+      # ============================================================
+
+      - name: 🎬 Convert video to MP4
         run: |
 
-          echo "Combining video and narration..."
+          WEBM_FILE=$(find render -name "*.webm" | head -1)
+
+          if [ -z "$WEBM_FILE" ]; then
+            echo "ERROR: No WebM file was created."
+            exit 1
+          fi
+
+          echo "WebM file:"
+          echo "$WEBM_FILE"
+
+          ffmpeg \
+            -y \
+            -i "$WEBM_FILE" \
+            -c:v libx264 \
+            -preset fast \
+            -crf 18 \
+            -pix_fmt yuv420p \
+            -an \
+            render/video-only.mp4
+
+          echo "Video-only MP4 created."
+
+
+      # ============================================================
+      # 18. CREATE FINAL AUDIO MIX
+      # ============================================================
+
+      - name: 🎧 Mix narration, music and sound effects
+        run: |
+
+          echo "Creating final soundtrack..."
+
+          ffmpeg \
+            -y \
+            -i audio/narration.wav \
+            -i audio/background_music.wav \
+            -i audio/sfx/notification.wav \
+            -i audio/sfx/network_failure.wav \
+            -i audio/sfx/payment.wav \
+            -i audio/sfx/radio.wav \
+            -i audio/sfx/city.wav \
+            -filter_complex "
+
+              [0:a]
+              loudnorm=I=-16:TP=-1.5:LRA=11,
+              volume=1.0,
+              apad=pad_dur=305
+              [voice];
+
+              [1:a]
+              atrim=duration=305,
+              volume=0.25
+              [music];
+
+              [2:a]
+              adelay=5000|5000,
+              volume=0.45
+              [notification];
+
+              [3:a]
+              adelay=38000|38000,
+              volume=0.50
+              [failure];
+
+              [4:a]
+              adelay=65000|65000,
+              volume=0.35
+              [payment1];
+
+              [4:a]
+              adelay=70000|70000,
+              volume=0.30
+              [payment2];
+
+              [5:a]
+              adelay=160000|160000,
+              volume=0.25
+              [radio];
+
+              [6:a]
+              adelay=115000|115000,
+              volume=0.18
+              [city1];
+
+              [6:a]
+              adelay=190000|190000,
+              volume=0.16
+              [city2];
+
+              [voice]
+              [music]
+              [notification]
+              [failure]
+              [payment1]
+              [payment2]
+              [radio]
+              [city1]
+              [city2]
+
+              amix=
+              inputs=9:
+              duration=first:
+              dropout_transition=2,
+
+              loudnorm=
+              I=-16:
+              TP=-1.5:
+              LRA=11
+
+              [finalaudio]
+
+            " \
+            -map "[finalaudio]" \
+            -c:a pcm_s16le \
+            -ar 48000 \
+            -ac 2 \
+            audio/final-soundtrack.wav
+
+          echo "Final soundtrack created."
+
+          ffprobe \
+            -hide_banner \
+            audio/final-soundtrack.wav
+
+
+      # ============================================================
+      # 19. COMBINE VIDEO + FINAL SOUNDTRACK
+      # ============================================================
+
+      - name: 🎬 Create final YouTube MP4
+        run: |
+
+          echo "Combining video and soundtrack..."
 
           ffmpeg \
             -y \
             -i render/video-only.mp4 \
-            -i audio/narration.wav \
-            -filter_complex \
-            "[1:a]volume=1.0[a]" \
+            -i audio/final-soundtrack.wav \
             -map 0:v:0 \
-            -map "[a]" \
+            -map 1:a:0 \
             -c:v copy \
             -c:a aac \
             -b:a 192k \
-            -shortest \
+            -ar 48000 \
+            -ac 2 \
+            -t 305 \
             -movflags +faststart \
             render/24-hours-without-internet.mp4
 
-          echo "Final narrated video created."
+          echo ""
+          echo "=========================================="
+          echo "FINAL VIDEO CREATED SUCCESSFULLY"
+          echo "=========================================="
 
           ffprobe \
             -hide_banner \
             render/24-hours-without-internet.mp4
 
-      # ------------------------------------------------------------
-      # 14. Upload final MP4
-      # ------------------------------------------------------------
-      - name: 📤 Upload final video
+
+      # ============================================================
+      # 20. UPLOAD FINAL VIDEO
+      # ============================================================
+
+      - name: 📤 Upload final YouTube video
         uses: actions/upload-artifact@v4
         with:
-          name: 24-hours-without-internet-narrated-video
+          name: 24-hours-without-internet-full-audio
           path: render/24-hours-without-internet.mp4
           retention-days: 7
 
-      # ------------------------------------------------------------
-      # 15. Upload narration separately for backup
-      # ------------------------------------------------------------
-      - name: 📤 Upload narration
+
+      # ============================================================
+      # 21. UPLOAD NARRATION
+      # ============================================================
+
+      - name: 📤 Upload narration backup
         uses: actions/upload-artifact@v4
         with:
           name: 24-hours-without-internet-narration
           path: audio/narration.wav
+          retention-days: 7
+
+
+      # ============================================================
+      # 22. UPLOAD MUSIC
+      # ============================================================
+
+      - name: 📤 Upload music backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: 24-hours-without-internet-background-music
+          path: audio/background_music.wav
+          retention-days: 7
+
+
+      # ============================================================
+      # 23. UPLOAD FINAL SOUNDTRACK
+      # ============================================================
+
+      - name: 📤 Upload final soundtrack
+        uses: actions/upload-artifact@v4
+        with:
+          name: 24-hours-without-internet-final-soundtrack
+          path: audio/final-soundtrack.wav
           retention-days: 7
